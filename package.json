@@ -1,0 +1,15 @@
+﻿{
+  "name": "courier-app",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm --workspace @courier/api run start:dev",
+    "dev:sender": "npm --workspace @courier/sender-mobile run start",
+    "dev:courier": "npm --workspace @courier/courier-mobile run start",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}

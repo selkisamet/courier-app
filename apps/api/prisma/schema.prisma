@@ -1,0 +1,470 @@
+﻿generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SENDER_INDIVIDUAL
+  SENDER_CORPORATE
+  COURIER
+  ADMIN
+}
+
+enum CourierStatus {
+  PENDING_REVIEW
+  ACTIVE
+  REJECTED
+  SUSPENDED
+}
+
+enum PaymentType {
+  CASH
+  ONLINE
+  CORPORATE
+}
+
+enum PayerType {
+  SENDER
+  RECEIVER
+}
+
+enum OrderStatus {
+  CREATED
+  PUBLISHED
+  ACCEPTED
+  PICKED_UP
+  ON_ROUTE
+  ARRIVED
+  DELIVERED
+  CANCELLED
+  DISPUTED
+}
+
+enum ProofType {
+  PICKUP_PHOTO
+  DELIVERY_PHOTO
+  GPS
+  OTP
+  NEIGHBOR_PROOF
+}
+
+enum LabelType {
+  FRAGILE
+  UPRIGHT
+  LIQUID
+  ELECTRONIC
+  NO_WET
+}
+
+enum AssignmentState {
+  OFFERED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum CancelReason {
+  NO_ONE_AT_ADDRESS
+  WRONG_ADDRESS
+  INVALID_PACKAGE
+  DIFFERENT_PACKAGE_THAN_DECLARED
+  SAFETY_RISK
+  OTHER
+}
+
+enum CancellationDecision {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+}
+
+enum HoldStatus {
+  ACTIVE
+  CAPTURED
+  RELEASED
+  EXPIRED
+}
+
+enum WalletEntryType {
+  TOPUP
+  COMMISSION_HOLD
+  COMMISSION_CAPTURE
+  COMMISSION_RELEASE
+  EARNING
+  ADJUSTMENT
+}
+
+enum EntryDirection {
+  DEBIT
+  CREDIT
+}
+
+enum SupportChannel {
+  IN_APP
+  WHATSAPP
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id               String   @id @default(cuid())
+  phone            String   @unique
+  email            String?  @unique
+  passwordHash     String
+  role             UserRole
+  fullName         String
+  organizationId   String?
+  organization     Organization? @relation(fields: [organizationId], references: [id])
+
+  senderOrders     Order[] @relation("SenderOrders")
+  payerOrders      Order[] @relation("PayerOrders")
+  disputes         Dispute[]
+  supportTickets   SupportTicket[]
+
+  courierProfile   CourierProfile?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Organization {
+  id          String @id @default(cuid())
+  name        String
+  taxNumber   String @unique
+  isActive    Boolean @default(true)
+
+  users       User[]
+  orders      Order[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CourierProfile {
+  id                 String @id @default(cuid())
+  userId             String @unique
+  taxNumber          String @unique
+  cityCode           String
+  vehicleType        String?
+  status             CourierStatus @default(PENDING_REVIEW)
+
+  user               User @relation(fields: [userId], references: [id])
+  documents          CourierDocument[]
+  wallet             Wallet?
+  assignments        OrderAssignment[]
+  assignedOrders     Order[] @relation("CourierAssignedOrders")
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([cityCode])
+  @@index([status])
+}
+
+model CourierDocument {
+  id          String @id @default(cuid())
+  courierId   String
+  type        String
+  fileKey     String
+  status      String @default("pending")
+  reviewedAt  DateTime?
+
+  courier     CourierProfile @relation(fields: [courierId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courierId])
+}
+
+model Order {
+  id                    String @id @default(cuid())
+  orderCode             String @unique
+  senderId              String
+  organizationId        String?
+  payerId               String?
+  assignedCourierId     String?
+
+  status                OrderStatus @default(CREATED)
+  payerType             PayerType
+  paymentType           PaymentType
+  boost                 Boolean @default(false)
+
+  pickupAddress         String
+  pickupLat             Decimal? @db.Decimal(10, 7)
+  pickupLng             Decimal? @db.Decimal(10, 7)
+  dropoffAddress        String
+  dropoffLat            Decimal? @db.Decimal(10, 7)
+  dropoffLng            Decimal? @db.Decimal(10, 7)
+
+  basePrice             Decimal @db.Decimal(12, 2)
+  boostFee              Decimal @default(0) @db.Decimal(12, 2)
+  totalPrice            Decimal @db.Decimal(12, 2)
+  platformCommission    Decimal @default(0) @db.Decimal(12, 2)
+  courierNetEarning     Decimal @default(0) @db.Decimal(12, 2)
+
+  courierNote           String?
+
+  sender                User @relation("SenderOrders", fields: [senderId], references: [id])
+  payer                 User? @relation("PayerOrders", fields: [payerId], references: [id])
+  organization          Organization? @relation(fields: [organizationId], references: [id])
+  assignedCourier       CourierProfile? @relation("CourierAssignedOrders", fields: [assignedCourierId], references: [id])
+
+  package               OrderPackage?
+  labels                OrderLabel[]
+  events                OrderEvent[]
+  proofs                OrderProof[]
+  assignments           OrderAssignment[]
+  cancellation          Cancellation?
+  disputes              Dispute[]
+  payment               Payment?
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([assignedCourierId])
+}
+
+model OrderPackage {
+  id             String @id @default(cuid())
+  orderId        String @unique
+  photoKey       String
+  weightKg       Decimal @db.Decimal(8, 2)
+  sizeClass      String
+  volumeCm3      Int?
+
+  order          Order @relation(fields: [orderId], references: [id])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model OrderLabel {
+  id            String @id @default(cuid())
+  orderId       String
+  label         LabelType
+
+  order         Order @relation(fields: [orderId], references: [id])
+
+  createdAt     DateTime @default(now())
+
+  @@unique([orderId, label])
+  @@index([orderId])
+}
+
+model OrderAssignment {
+  id            String @id @default(cuid())
+  orderId       String
+  courierId     String
+  state         AssignmentState @default(OFFERED)
+
+  order         Order @relation(fields: [orderId], references: [id])
+  courier       CourierProfile @relation(fields: [courierId], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([courierId])
+  @@index([state])
+}
+
+model OrderEvent {
+  id            String @id @default(cuid())
+  orderId       String
+  actorUserId   String?
+  eventType     String
+  payload       Json?
+
+  order         Order @relation(fields: [orderId], references: [id])
+
+  createdAt     DateTime @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+model OrderProof {
+  id            String @id @default(cuid())
+  orderId       String
+  proofType     ProofType
+  fileKey       String?
+  lat           Decimal? @db.Decimal(10, 7)
+  lng           Decimal? @db.Decimal(10, 7)
+  otpHash       String?
+  otpVerifiedAt DateTime?
+  metadata      Json?
+
+  order         Order @relation(fields: [orderId], references: [id])
+
+  createdAt     DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model Cancellation {
+  id            String @id @default(cuid())
+  orderId       String @unique
+  requestedBy   String
+  reason        CancelReason
+  freeText      String?
+  proofPhotoKey String?
+  proofLat      Decimal? @db.Decimal(10, 7)
+  proofLng      Decimal? @db.Decimal(10, 7)
+  decision      CancellationDecision @default(PENDING)
+
+  order         Order @relation(fields: [orderId], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Dispute {
+  id            String @id @default(cuid())
+  orderId       String
+  createdById   String
+  subject       String
+  detail        String
+  status        SupportStatus @default(OPEN)
+
+  order         Order @relation(fields: [orderId], references: [id])
+  createdBy     User @relation(fields: [createdById], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([createdById])
+}
+
+model Payment {
+  id                 String @id @default(cuid())
+  orderId            String @unique
+  provider           String?
+  providerRef        String?
+  payerType          PayerType
+  paymentType        PaymentType
+  status             PaymentStatus @default(PENDING)
+  grossAmount        Decimal @db.Decimal(12, 2)
+  commissionAmount   Decimal @default(0) @db.Decimal(12, 2)
+  courierNetAmount   Decimal @default(0) @db.Decimal(12, 2)
+  collectedByCourier Boolean @default(false)
+
+  order              Order @relation(fields: [orderId], references: [id])
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Wallet {
+  id             String @id @default(cuid())
+  courierId      String @unique
+  balance        Decimal @default(0) @db.Decimal(12, 2)
+  currency       String @default("TRY")
+
+  courier        CourierProfile @relation(fields: [courierId], references: [id])
+  holds          WalletHold[]
+  entries        WalletLedger[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model WalletHold {
+  id             String @id @default(cuid())
+  walletId       String
+  orderId        String
+  amount         Decimal @db.Decimal(12, 2)
+  status         HoldStatus @default(ACTIVE)
+  capturedAt     DateTime?
+  releasedAt     DateTime?
+
+  wallet         Wallet @relation(fields: [walletId], references: [id])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([walletId, orderId])
+  @@index([orderId])
+}
+
+model WalletLedger {
+  id             String @id @default(cuid())
+  walletId       String
+  orderId        String?
+  entryType      WalletEntryType
+  direction      EntryDirection
+  amount         Decimal @db.Decimal(12, 2)
+  description    String?
+
+  wallet         Wallet @relation(fields: [walletId], references: [id])
+
+  createdAt      DateTime @default(now())
+
+  @@index([walletId, createdAt])
+  @@index([orderId])
+}
+
+model PricingRule {
+  id             String @id @default(cuid())
+  cityCode       String
+  name           String
+  isBoost        Boolean @default(false)
+  baseFee        Decimal @db.Decimal(12, 2)
+  perKmRate      Decimal @db.Decimal(12, 2)
+  minFee         Decimal @db.Decimal(12, 2)
+  isActive       Boolean @default(true)
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([cityCode, isActive])
+}
+
+model CityCoefficient {
+  id             String @id @default(cuid())
+  cityCode       String @unique
+  coefficient    Decimal @db.Decimal(6, 3)
+  isActive       Boolean @default(true)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model SupportTicket {
+  id             String @id @default(cuid())
+  orderId        String?
+  userId         String
+  channel        SupportChannel
+  status         SupportStatus @default(OPEN)
+  subject        String
+  message        String
+
+  user           User @relation(fields: [userId], references: [id])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([orderId])
+}
