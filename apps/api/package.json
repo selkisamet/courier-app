@@ -8,7 +8,8 @@
     "build": "nest build",
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -27,6 +28,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.30",
     "prisma": "^5.22.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }
 }
