@@ -1,5 +1,6 @@
 ﻿import { Module } from "@nestjs/common";
 import { AuthModule } from "./modules/auth/auth.module";
+import { CourierOrdersModule } from "./modules/courier-orders/courier-orders.module";
 import { CouriersModule } from "./modules/couriers/couriers.module";
 import { HealthModule } from "./modules/health/health.module";
 import { OrdersModule } from "./modules/orders/orders.module";
@@ -13,6 +14,7 @@ import { SupportModule } from "./modules/support/support.module";
     AuthModule,
     HealthModule,
     OrdersModule,
+    CourierOrdersModule,
     CouriersModule,
     PricingModule,
     SupportModule,

@@ -1,4 +1,4 @@
-﻿import { Body, Controller, Get, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Post, UseGuards } from "@nestjs/common";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
@@ -8,7 +8,7 @@ import { CouriersService } from "./couriers.service";
 
 @Controller("couriers")
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles("COURIER", "ADMIN")
+@Roles("COURIER")
 export class CouriersController {
   constructor(private readonly couriersService: CouriersService) {}
 
@@ -37,3 +37,4 @@ export class CouriersController {
     return this.couriersService.getMyWalletLedger(user);
   }
 }
+

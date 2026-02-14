@@ -43,7 +43,7 @@ export class OrdersService {
         orderCode: this.buildOrderCode(),
         senderId: user.sub,
         payerId: input.payerType === "sender" ? user.sub : null,
-        status: OrderStatus.CREATED,
+        status: OrderStatus.PUBLISHED,
         payerType: input.payerType === "sender" ? PayerType.SENDER : PayerType.RECEIVER,
         paymentType: this.mapPaymentType(input.paymentType),
         boost: input.boost,
@@ -67,14 +67,25 @@ export class OrdersService {
           create: labelValues.map((label) => ({ label })),
         },
         events: {
-          create: {
-            actorUserId: user.sub,
-            eventType: "ORDER_CREATED",
-            payload: {
-              payerType: input.payerType,
-              paymentType: input.paymentType,
-              boost: input.boost,
-            },
+          createMany: {
+            data: [
+              {
+                actorUserId: user.sub,
+                eventType: "ORDER_CREATED",
+                payload: {
+                  payerType: input.payerType,
+                  paymentType: input.paymentType,
+                  boost: input.boost,
+                },
+              },
+              {
+                actorUserId: user.sub,
+                eventType: "ORDER_PUBLISHED",
+                payload: {
+                  boosted: input.boost,
+                },
+              },
+            ],
           },
         },
         payment: {
