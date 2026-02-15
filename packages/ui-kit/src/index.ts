@@ -1,1 +1,1 @@
-﻿export const uiKitVersion = "0.1.0";
+export const uiKitVersion = "0.1.0";

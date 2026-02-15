@@ -1,31 +1,14 @@
-﻿import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { LabelType, OrderStatus, PaymentType, PayerType } from "@prisma/client";
 import { TokenPayload } from "../../common/types/token-payload.type";
 import { PrismaService } from "../prisma/prisma.service";
-
-type CreateOrderPackageInput = {
-  photoKey: string;
-  weightKg: number;
-  sizeClass: string;
-  volumeCm3?: number;
-  labels?: string[];
-  note?: string;
-};
-
-export type CreateOrderInput = {
-  pickupAddress: string;
-  dropoffAddress: string;
-  payerType: "sender" | "receiver";
-  paymentType: "cash" | "online" | "corporate";
-  boost: boolean;
-  package: CreateOrderPackageInput;
-};
+import { CreateOrderDto } from "./dto/create-order.dto";
 
 @Injectable()
 export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createOrder(input: CreateOrderInput, user: TokenPayload) {
+  async createOrder(input: CreateOrderDto, user: TokenPayload) {
     if (input.paymentType === "corporate" && user.role !== "SENDER_CORPORATE") {
       throw new BadRequestException("Corporate payment is allowed only for corporate senders");
     }

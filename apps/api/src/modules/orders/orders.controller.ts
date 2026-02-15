@@ -1,10 +1,11 @@
-﻿import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { TokenPayload } from "../../common/types/token-payload.type";
-import { CreateOrderInput, OrdersService } from "./orders.service";
+import { CreateOrderDto } from "./dto/create-order.dto";
+import { OrdersService } from "./orders.service";
 
 @Controller("orders")
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -13,7 +14,7 @@ export class OrdersController {
 
   @Post()
   @Roles("SENDER_INDIVIDUAL", "SENDER_CORPORATE", "ADMIN")
-  createOrder(@Body() body: CreateOrderInput, @CurrentUser() user: TokenPayload) {
+  createOrder(@Body() body: CreateOrderDto, @CurrentUser() user: TokenPayload) {
     return this.ordersService.createOrder(body, user);
   }
 

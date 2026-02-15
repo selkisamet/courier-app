@@ -36,5 +36,15 @@ export class CouriersController {
   getMyWalletLedger(@CurrentUser() user: TokenPayload) {
     return this.couriersService.getMyWalletLedger(user);
   }
+
+  @Post("me/wallet/topup-intent")
+  topupMyWallet(@CurrentUser() user: TokenPayload, @Body() body: { amount: number }) {
+    return this.couriersService.topupMyWallet(user, body);
+  }
+
+  @Get("me/wallet/holds")
+  getMyWalletHolds(@CurrentUser() user: TokenPayload) {
+    return this.couriersService.getMyWalletHolds(user);
+  }
 }
 

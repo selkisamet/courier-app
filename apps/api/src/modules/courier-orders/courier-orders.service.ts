@@ -1,4 +1,4 @@
-﻿import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import {
   AssignmentState,
   EntryDirection,
@@ -55,7 +55,7 @@ export class CourierOrdersService {
         throw new NotFoundException("Order not found");
       }
 
-      if (![OrderStatus.CREATED, OrderStatus.PUBLISHED].includes(order.status)) {
+      if (order.status !== OrderStatus.CREATED && order.status !== OrderStatus.PUBLISHED) {
         throw new BadRequestException("Order is not available for acceptance");
       }
 

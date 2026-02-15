@@ -25,7 +25,12 @@ export class OrderProofsService {
   async uploadPhoto(orderId: string, user: TokenPayload, input: UploadPhotoInput) {
     const order = await this.assertCourierOrder(orderId, user);
 
-    if (![OrderStatus.ACCEPTED, OrderStatus.PICKED_UP, OrderStatus.ON_ROUTE, OrderStatus.ARRIVED].includes(order.status)) {
+    if (
+      order.status !== OrderStatus.ACCEPTED &&
+      order.status !== OrderStatus.PICKED_UP &&
+      order.status !== OrderStatus.ON_ROUTE &&
+      order.status !== OrderStatus.ARRIVED
+    ) {
       throw new BadRequestException("Order state does not allow proof upload");
     }
 
@@ -43,7 +48,7 @@ export class OrderProofsService {
   async uploadGps(orderId: string, user: TokenPayload, input: UploadGpsInput) {
     const order = await this.assertCourierOrder(orderId, user);
 
-    if (![OrderStatus.ON_ROUTE, OrderStatus.ARRIVED].includes(order.status)) {
+    if (order.status !== OrderStatus.ON_ROUTE && order.status !== OrderStatus.ARRIVED) {
       throw new BadRequestException("Order must be on-route or arrived to save GPS proof");
     }
 

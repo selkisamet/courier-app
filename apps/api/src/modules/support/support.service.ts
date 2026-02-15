@@ -1,4 +1,4 @@
-﻿import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { SupportChannel, SupportStatus } from "@prisma/client";
 import { TokenPayload } from "../../common/types/token-payload.type";
 import { PrismaService } from "../prisma/prisma.service";

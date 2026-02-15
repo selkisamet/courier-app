@@ -1,13 +1,29 @@
-﻿export type LoginDto = {
-  phone: string;
-  password: string;
-};
+﻿import { IsNotEmpty, IsString, Matches, MinLength } from "class-validator";
 
-export type RefreshDto = {
-  refreshToken: string;
-};
+export class LoginDto {
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\+?[0-9]{10,15}$/)
+  phone!: string;
 
-export type VerifyPhoneOtpDto = {
-  phone: string;
-  otp: string;
-};
+  @IsString()
+  @MinLength(8)
+  password!: string;
+}
+
+export class RefreshDto {
+  @IsString()
+  @IsNotEmpty()
+  refreshToken!: string;
+}
+
+export class VerifyPhoneOtpDto {
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\+?[0-9]{10,15}$/)
+  phone!: string;
+
+  @IsString()
+  @Matches(/^[0-9]{4}$/)
+  otp!: string;
+}

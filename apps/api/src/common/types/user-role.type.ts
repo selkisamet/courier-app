@@ -1,1 +1,1 @@
-﻿export type UserRole = "SENDER_INDIVIDUAL" | "SENDER_CORPORATE" | "COURIER" | "ADMIN";
+export type UserRole = "SENDER_INDIVIDUAL" | "SENDER_CORPORATE" | "COURIER" | "ADMIN";

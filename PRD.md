@@ -1,4 +1,4 @@
-﻿# PRD - Courier App
+# PRD - Courier App
 
 ## 1. Urun Ozeti
 Bu proje, Banabikurye benzeri ancak operasyonel guvenlik, finansal kontrol ve kurye deneyimi acisindan gelistirilmis bir kurye platformudur.

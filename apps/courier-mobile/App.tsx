@@ -145,6 +145,19 @@ export default function App() {
             <Text style={styles.buttonText}>Get Available Orders</Text>
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={styles.buttonSecondary}
+            onPress={() => runAction("/couriers/me/wallet/topup-intent", "POST", { amount: 500 })}
+          >
+            <Text style={styles.buttonText}>Topup Wallet (+500)</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonSecondary} onPress={() => runAction("/couriers/me/wallet", "GET")}>
+            <Text style={styles.buttonText}>Get Wallet</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonSecondary} onPress={() => runAction("/couriers/me/wallet/holds", "GET")}>
+            <Text style={styles.buttonText}>Get Wallet Holds</Text>
+          </TouchableOpacity>
+
           <TextInput style={styles.input} value={orderId} onChangeText={setOrderId} placeholder="Order ID" />
 
           <TouchableOpacity style={styles.button} onPress={() => runAction(`/courier/orders/${orderId}/accept`)}>

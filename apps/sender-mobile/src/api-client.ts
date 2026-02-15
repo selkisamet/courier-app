@@ -1,4 +1,4 @@
-﻿import { getApiBaseUrl } from "./config";
+import { getApiBaseUrl } from "./config";
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";

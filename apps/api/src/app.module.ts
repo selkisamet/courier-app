@@ -1,4 +1,4 @@
-﻿import { Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CourierOrdersModule } from "./modules/courier-orders/courier-orders.module";
 import { CouriersModule } from "./modules/couriers/couriers.module";

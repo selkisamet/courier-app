@@ -1,4 +1,4 @@
-﻿export type UserRole = "sender_individual" | "sender_corporate" | "courier" | "admin";
+export type UserRole = "sender_individual" | "sender_corporate" | "courier" | "admin";
 
 export type PaymentType = "cash" | "online" | "corporate";
 export type PayerType = "sender" | "receiver";

@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: courier-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: courier_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "55432:5432"
+    volumes:
+      - courier_postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: courier-redis
+    restart: unless-stopped
+    ports:
+      - "56379:6379"
+    volumes:
+      - courier_redis_data:/data
+
+volumes:
+  courier_postgres_data:
+  courier_redis_data:
+
+

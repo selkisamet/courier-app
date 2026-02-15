@@ -1,17 +1,44 @@
-﻿export type RegisterBaseDto = {
-  fullName: string;
-  phone: string;
+﻿import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from "class-validator";
+
+export class RegisterBaseDto {
+  @IsString()
+  @IsNotEmpty()
+  fullName!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\+?[0-9]{10,15}$/)
+  phone!: string;
+
+  @IsOptional()
+  @IsEmail()
   email?: string;
-  password: string;
-};
 
-export type RegisterCorporateDto = RegisterBaseDto & {
-  organizationName: string;
-  organizationTaxNumber: string;
-};
+  @IsString()
+  @MinLength(8)
+  password!: string;
+}
 
-export type RegisterCourierDto = RegisterBaseDto & {
-  taxNumber: string;
-  cityCode: string;
+export class RegisterCorporateDto extends RegisterBaseDto {
+  @IsString()
+  @IsNotEmpty()
+  organizationName!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  organizationTaxNumber!: string;
+}
+
+export class RegisterCourierDto extends RegisterBaseDto {
+  @IsString()
+  @IsNotEmpty()
+  taxNumber!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  cityCode!: string;
+
+  @IsOptional()
+  @IsString()
   vehicleType?: string;
-};
+}

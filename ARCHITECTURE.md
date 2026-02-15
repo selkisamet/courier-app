@@ -1,4 +1,4 @@
-﻿# Technical Architecture - Courier App
+# Technical Architecture - Courier App
 
 ## 1. Mimari Yaklasim
 - Mobile-first, API-first, role-based platform

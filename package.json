@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "courier-app",
   "private": true,
   "version": "0.1.0",
@@ -7,6 +7,10 @@
     "packages/*"
   ],
   "scripts": {
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "api:db:push": "npm --workspace @courier/api run prisma:db:push",
+    "api:seed": "npm --workspace @courier/api run prisma:seed",
     "dev:api": "npm --workspace @courier/api run start:dev",
     "dev:sender": "npm --workspace @courier/sender-mobile run start",
     "dev:courier": "npm --workspace @courier/courier-mobile run start",

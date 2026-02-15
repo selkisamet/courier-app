@@ -1,4 +1,4 @@
-﻿# API Endpoint List - MVP
+# API Endpoint List - MVP
 
 Base URL: `/api/v1`
 Auth: Bearer JWT
