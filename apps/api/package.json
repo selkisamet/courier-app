@@ -8,7 +8,7 @@
     "build": "nest build",
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
-    "prisma:db:push": "prisma db push",
+    "prisma:db:push": "prisma db push --skip-generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts"
   },
