@@ -3,6 +3,7 @@
     "name": "Courier Sender",
     "slug": "courier-sender",
     "version": "0.1.0",
+    "newArchEnabled": true,
     "orientation": "portrait"
   }
 }
